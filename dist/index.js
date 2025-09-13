@@ -25695,6 +25695,8 @@ async function run() {
         if (!oidcRequestToken || !oidcRequestUrl) {
             throw new Error('Missing GitHub OIDC request environment variables.');
         }
+        // Mask OIDC tokens and URLs
+        core.setSecret(oidcRequestToken);
         const tokenUrl = `${oidcRequestUrl}&audience=${encodeURIComponent(nugetAudience)}`;
         core.info(`Requesting GitHub OIDC token from: ${tokenUrl}`);
         const http = new httpm.HttpClient();
@@ -25705,6 +25707,7 @@ async function run() {
             throw new Error('Failed to retrieve OIDC token from GitHub.');
         }
         const oidcToken = tokenResponse.result.value;
+        core.setSecret(oidcToken);
         // Build the request body
         const body = JSON.stringify({
             username: nugetUsername,
@@ -25720,7 +25723,20 @@ async function run() {
         const response = await tokenServiceHttpClient.post(nugetTokenServiceUrl, body, headers);
         if (response.message.statusCode !== 200) {
             const errorBody = await response.readBody();
-            throw new Error(`Token exchange failed (${response.message.statusCode}): ${errorBody}`);
+            let errorMessage = `Token exchange failed (${response.message.statusCode})`;
+            try {
+                const errorJson = JSON.parse(errorBody);
+                if (errorJson && typeof errorJson.error === 'string') {
+                    errorMessage += `: ${errorJson.error}`;
+                }
+                else {
+                    errorMessage += `: ${errorBody}`;
+                }
+            }
+            catch {
+                errorMessage += `: ${errorBody}`;
+            }
+            throw new Error(errorMessage);
         }
         const responseBody = await response.readBody();
         const data = JSON.parse(responseBody);
