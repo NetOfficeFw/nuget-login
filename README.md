@@ -6,7 +6,7 @@ This GitHub Action enables secure, passwordless authentication to NuGet servers 
 
 ```yaml
 - name: NuGet Login
-  uses: NetOfficeFw/nuget-login@v1
+  uses: NetOfficeFw/nuget-login@v2
   id: nuget_auth
   with:
     user: my-nuget-username
@@ -63,7 +63,7 @@ jobs:
     - uses: actions/checkout@v6
 
     - name: NuGet Login
-      uses: NetOfficeFw/nuget-login@v1
+      uses: NetOfficeFw/nuget-login@v2
       id: nuget_auth
       with:
         user: my-nuget-username
