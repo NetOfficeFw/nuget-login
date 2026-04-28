@@ -10,8 +10,8 @@
     "build": "ncc build src/index.ts -o dist"
   },
   "dependencies": {
-    "@actions/core": "^3.0.0",
-    "@actions/http-client": "^4.0.0"
+    "@actions/core": "^3.0.1",
+    "@actions/http-client": "^4.0.1"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.4",
